@@ -1,0 +1,1081 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f9f6ef">
+  <title>Hypercerts: A Crash Course — for Loden Tewa</title>
+  <style>
+    /* === LOCAL BRAND FONTS === */
+    @font-face {
+      font-family: "Instrument Serif";
+      src: url("./assets/fonts/InstrumentSerif-Regular.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "Instrument Serif";
+      src: url("./assets/fonts/InstrumentSerif-Italic.woff2") format("woff2");
+      font-style: italic;
+      font-weight: 400;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "Switzer Variable";
+      src: url("./assets/fonts/Switzer-Variable.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 100 900;
+      font-display: swap;
+    }
+
+    /* === BRAND TOKENS === */
+    :root {
+      --black: #000000;
+      --accent: #af2901;
+      --body: #535353;
+      --muted: #666666;
+      --white: #ffffff;
+      --grey-bg: #f1f1f1;
+      --cream: #f9f6ef;
+      --separator: #d2d2d2;
+      --grey-light: #d7d7d7;
+      --tag: #ececec;
+      --ornament-teal: #33b899;
+      --pad-x: clamp(2rem, 6cqw, 4.8rem);
+      --pad-y: clamp(2rem, 5.5cqw, 4.4rem);
+      --gap: clamp(1rem, 2.5cqw, 2rem);
+      --small-gap: clamp(.6rem, 1.25cqw, 1rem);
+      --radius: clamp(.5rem, 1cqw, .75rem);
+    }
+
+    /* === RESET AND SLIDE CANVAS === */
+    * { box-sizing: border-box; }
+    html {
+      background: #3a3a38;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      overflow-y: auto;
+    }
+    body {
+      margin: 0;
+      min-width: 18rem;
+      color: var(--black);
+      background: #3a3a38;
+      font-family: "Switzer Variable", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button { font: inherit; }
+    img { max-width: 100%; }
+    .deck {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .slide {
+      container-type: size;
+      position: relative;
+      flex: none;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      max-width: 177.78vh;
+      max-height: 56.25vw;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      scroll-snap-align: center;
+      isolation: isolate;
+    }
+    .slide.cream { background: var(--cream); }
+    .slide.white { background: var(--white); }
+    .slide.grey { background: var(--grey-bg); }
+    .slide-shell {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      padding: var(--pad-y) var(--pad-x);
+    }
+
+    /* === TYPE SCALE === */
+    .eyebrow,
+    .slide-number,
+    .micro,
+    .slot-label {
+      font-family: "Switzer Variable", system-ui, sans-serif;
+      font-size: clamp(.72rem, 1.406cqw, 1.125rem);
+      line-height: 1.2;
+    }
+    .eyebrow {
+      color: var(--body);
+      font-weight: 500;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+    }
+    .eyebrow.accent { color: var(--accent); }
+    .top-row .eyebrow:last-child {
+      padding: clamp(.2rem, .4cqw, .35rem) clamp(.4rem, .8cqw, .65rem);
+      margin-right: clamp(3.5rem, 8cqw, 6rem);
+      border-radius: clamp(.2rem, .4cqw, .35rem);
+      background: var(--cream);
+    }
+    .slide-number {
+      position: absolute;
+      top: var(--pad-y);
+      right: var(--pad-x);
+      z-index: 4;
+      color: var(--body);
+      padding: clamp(.2rem, .4cqw, .35rem) clamp(.4rem, .8cqw, .65rem);
+      border-radius: clamp(.2rem, .4cqw, .35rem);
+      background: var(--white);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    h1, h2, h3, p, ul, blockquote { margin: 0; }
+    h1, h2, h3, blockquote {
+      font-family: "Instrument Serif", Georgia, serif;
+      font-weight: 400;
+      letter-spacing: -.02em;
+    }
+    .display {
+      font-size: clamp(2.65rem, 5.625cqw, 4.5rem);
+      line-height: 1;
+    }
+    .title {
+      max-width: 72cqw;
+      font-size: clamp(3rem, 7.2cqw, 5.8rem);
+      line-height: .94;
+    }
+    .heading {
+      max-width: 75cqw;
+      font-size: clamp(2.15rem, 3.75cqw, 3rem);
+      line-height: 1.1;
+    }
+    .lead {
+      font-size: clamp(1.2rem, 2.5cqw, 2rem);
+      line-height: 1.15;
+      letter-spacing: -.02em;
+    }
+    .body-copy {
+      color: var(--body);
+      font-size: clamp(1rem, 1.875cqw, 1.5rem);
+      line-height: 1.35;
+      letter-spacing: -.02em;
+    }
+    .small-copy {
+      color: var(--body);
+      font-size: clamp(.78rem, 1.406cqw, 1.125rem);
+      line-height: 1.45;
+    }
+    .accent { color: var(--accent); }
+    em { font-style: italic; }
+
+    /* === SHARED STRUCTURE === */
+    .top-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--gap);
+    }
+    .content-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, .9fr);
+      align-items: center;
+      gap: clamp(1.5rem, 6cqw, 5rem);
+      min-height: 0;
+      flex: 1;
+    }
+    .content-row.wide-left { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); }
+    .copy-stack {
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap);
+      min-width: 0;
+    }
+    .rule {
+      width: 100%;
+      height: clamp(1px, .16cqw, 2px);
+      background: var(--black);
+    }
+    .thin-rule {
+      width: 100%;
+      height: clamp(1px, .08cqw, 1px);
+      background: var(--separator);
+    }
+    .logo {
+      display: block;
+      width: auto;
+      height: clamp(1.25rem, 2.6cqw, 2.1rem);
+      object-fit: contain;
+      object-position: left center;
+    }
+    .logo.hypercerts { height: clamp(1.25rem, 2.6cqw, 2.1rem); }
+    .logo.dabtong { height: clamp(1.5rem, 4cqw, 3.1rem); }
+    .logo.ma-earth { height: clamp(1.2rem, 2.9cqw, 2.35rem); }
+    .logo.gainforest { height: clamp(1.4rem, 4.2cqw, 3.2rem); }
+    .logo-lockup {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: clamp(.8rem, 2cqw, 1.6rem);
+    }
+    .footer-lockup {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--gap);
+      margin-top: auto;
+    }
+    .footer-lockup .small-copy { text-align: right; }
+
+    /* === GUILLOCHE ORNAMENT === */
+    .ornament {
+      position: absolute;
+      z-index: 0;
+      pointer-events: none;
+      width: clamp(20rem, 46cqw, 37rem);
+      opacity: .23;
+    }
+    .ornament.top-right { top: clamp(-10rem, -14cqw, -6rem); right: clamp(-8rem, -12cqw, -4rem); }
+    .ornament.bottom-left { bottom: clamp(-12rem, -16cqw, -6rem); left: clamp(-8rem, -12cqw, -4rem); }
+    .ornament.bottom-right { right: clamp(-8rem, -12cqw, -4rem); bottom: clamp(-15rem, -20cqw, -7rem); }
+    .ornament.center-bottom { bottom: clamp(-15rem, -24cqw, -8rem); left: 23cqw; width: clamp(22rem, 50cqw, 40rem); opacity: .16; }
+
+    /* === ILLUSTRATION PLACEHOLDERS === */
+    .illustration-slot {
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-start;
+      min-height: clamp(12rem, 31cqw, 24rem);
+      border: clamp(1px, .12cqw, 2px) solid var(--separator);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, transparent 49.8%, rgba(210,210,210,.55) 50%, transparent 50.2%),
+        linear-gradient(45deg, transparent 49.8%, rgba(210,210,210,.55) 50%, transparent 50.2%),
+        var(--grey-bg);
+    }
+    .illustration-slot::before,
+    .illustration-slot::after {
+      position: absolute;
+      content: "";
+      pointer-events: none;
+      border: clamp(1px, .12cqw, 2px) solid rgba(175,41,1,.35);
+      border-radius: 50%;
+    }
+    .illustration-slot::before { width: 35%; aspect-ratio: 1; top: 18%; left: 30%; }
+    .illustration-slot::after { width: 12%; aspect-ratio: 1; top: 43%; left: 44%; background: rgba(175,41,1,.12); }
+    .illustration-slot.has-image {
+      align-items: stretch;
+      justify-content: stretch;
+      height: min(50vh, 400px);
+      min-height: min(50vh, 400px);
+      background: var(--grey-bg);
+    }
+    .illustration-slot.has-image::before,
+    .illustration-slot.has-image::after { display: none; }
+    .illustration-image {
+      display: block;
+      width: 100%;
+      height: 100%;
+      max-height: min(50vh, 400px);
+      object-fit: cover;
+    }
+    .proof-image {
+      display: block;
+      width: 100%;
+      height: clamp(7rem, 15cqw, 11rem);
+      max-height: min(50vh, 400px);
+      border: clamp(1px, .12cqw, 2px) solid var(--separator);
+      border-radius: var(--radius);
+      object-fit: cover;
+    }
+    .history-image {
+      display: block;
+      width: 100%;
+      height: clamp(4rem, 7cqw, 5rem);
+      max-height: min(50vh, 400px);
+      border: clamp(1px, .12cqw, 2px) solid var(--separator);
+      border-radius: var(--radius);
+      object-fit: cover;
+    }
+    .slot-label {
+      position: relative;
+      z-index: 1;
+      padding: clamp(.6rem, 1.2cqw, 1rem);
+      background: var(--white);
+      color: var(--body);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .slot-label strong { color: var(--accent); font-weight: 500; }
+
+    /* === DIAGRAM NODES === */
+    .diagram-node {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: clamp(3.2rem, 7.2cqw, 5.8rem);
+      padding: clamp(.7rem, 1.5cqw, 1.2rem) clamp(.8rem, 2cqw, 1.6rem);
+      border-radius: var(--radius);
+      background: var(--grey-bg);
+      color: var(--black);
+      font-family: "Switzer Variable", system-ui, sans-serif;
+      font-size: clamp(1rem, 1.875cqw, 1.5rem);
+      line-height: 1.2;
+      text-align: center;
+    }
+    .diagram-node.key {
+      background: var(--ornament-teal);
+      color: var(--white);
+    }
+    .diagram-node img { max-height: clamp(1.7rem, 4cqw, 3rem); width: auto; }
+    .brand-node { gap: clamp(.4rem, 1cqw, .8rem); }
+    .diagram-node.key img.brand-mark { filter: brightness(0) invert(1); }
+    .connector-h { flex: 1; height: clamp(1px, .18cqw, 2px); background: var(--ornament-teal); }
+    .connector-v { width: clamp(1px, .18cqw, 2px); height: clamp(1.5rem, 3cqw, 2.4rem); background: var(--ornament-teal); }
+    .arrow-right {
+      width: 0;
+      height: 0;
+      border-top: clamp(.35rem, .6cqw, .55rem) solid transparent;
+      border-bottom: clamp(.35rem, .6cqw, .55rem) solid transparent;
+      border-left: clamp(.5rem, .9cqw, .75rem) solid var(--ornament-teal);
+    }
+    .arrow-down {
+      width: 0;
+      height: 0;
+      border-right: clamp(.35rem, .6cqw, .55rem) solid transparent;
+      border-left: clamp(.35rem, .6cqw, .55rem) solid transparent;
+      border-top: clamp(.5rem, .9cqw, .75rem) solid var(--ornament-teal);
+    }
+
+    /* === SLIDE-SPECIFIC VISUALS === */
+    .title-lockup {
+      display: flex;
+      align-items: center;
+      gap: clamp(.7rem, 1.8cqw, 1.5rem);
+      margin-top: clamp(1rem, 3cqw, 2.4rem);
+    }
+    .title-lockup .rule { width: clamp(2rem, 8cqw, 6rem); }
+    .title-lockup .body-copy { color: var(--body); }
+    .bullet-list {
+      display: grid;
+      gap: clamp(.7rem, 1.5cqw, 1.2rem);
+      padding: 0;
+      list-style: none;
+    }
+    .bullet-list li {
+      display: grid;
+      grid-template-columns: clamp(.55rem, 1cqw, .8rem) 1fr;
+      gap: clamp(.6rem, 1.3cqw, 1rem);
+      align-items: start;
+      color: var(--body);
+      font-size: clamp(1rem, 1.875cqw, 1.5rem);
+      line-height: 1.3;
+    }
+    .bullet-list li::before {
+      width: clamp(.38rem, .7cqw, .55rem);
+      height: clamp(.38rem, .7cqw, .55rem);
+      margin-top: .45em;
+      border-radius: 50%;
+      background: var(--accent);
+      content: "";
+    }
+    .schema-card {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(.7rem, 1.5cqw, 1.2rem);
+      padding: clamp(1rem, 2.5cqw, 2rem);
+      border: clamp(1px, .12cqw, 2px) solid var(--separator);
+      border-radius: var(--radius);
+      background: var(--white);
+    }
+    .schema-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--small-gap);
+      padding-bottom: clamp(.45rem, 1cqw, .8rem);
+      border-bottom: clamp(1px, .08cqw, 1px) solid var(--separator);
+      color: var(--body);
+      font-family: "Switzer Variable", system-ui, sans-serif;
+      font-size: clamp(.82rem, 1.406cqw, 1.125rem);
+    }
+    .schema-line:last-child { border-bottom: 0; padding-bottom: 0; }
+    .schema-line code {
+      color: var(--accent);
+      font-family: "Switzer Variable", system-ui, sans-serif;
+      font-weight: 500;
+    }
+    .three-columns {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--gap);
+    }
+    .column-card {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(.7rem, 1.3cqw, 1rem);
+      padding-top: clamp(.8rem, 1.6cqw, 1.3rem);
+      border-top: clamp(1px, .16cqw, 2px) solid var(--black);
+    }
+    .column-card h3 {
+      font-size: clamp(1.35rem, 2.5cqw, 2rem);
+      line-height: 1.05;
+    }
+    .figure {
+      font-family: "Instrument Serif", Georgia, serif;
+      font-size: clamp(3rem, 5.625cqw, 4.5rem);
+      line-height: .9;
+    }
+    .figure-label {
+      color: var(--body);
+      font-size: clamp(.72rem, 1.406cqw, 1.125rem);
+      line-height: 1.25;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .proof-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: var(--gap);
+      min-height: clamp(14rem, 36cqw, 28rem);
+      padding: clamp(1rem, 2.5cqw, 2rem);
+      border: clamp(1px, .12cqw, 2px) solid var(--separator);
+      border-radius: var(--radius);
+      background: var(--white);
+    }
+    .proof-logos {
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap);
+    }
+    .proof-logos .thin-rule { margin: 0; }
+    .proof-caption {
+      color: var(--muted);
+      font-size: clamp(.72rem, 1.25cqw, 1rem);
+      line-height: 1.35;
+    }
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: clamp(.35rem, 1cqw, .8rem);
+    }
+    .flow-row .diagram-node { flex: 1; }
+    .flow-row .diagram-node.compact { min-width: 0; padding-inline: clamp(.4rem, 1cqw, .8rem); }
+    #slide-12 .diagram-node.compact { background: var(--grey-bg); }
+    .graph {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) clamp(1.3rem, 3cqw, 2.4rem) minmax(0, 1fr);
+      grid-template-rows: auto clamp(1.5rem, 3cqw, 2.4rem) auto;
+      align-items: center;
+      width: 100%;
+      max-width: 58cqw;
+      margin-inline: auto;
+    }
+    .graph .diagram-node { min-height: clamp(3.3rem, 6cqw, 4.8rem); }
+    .graph-center { grid-column: 2; grid-row: 2; display: flex; justify-content: center; }
+    .graph-hline { width: 100%; height: clamp(1px, .18cqw, 2px); background: var(--ornament-teal); }
+    .graph-vline { width: clamp(1px, .18cqw, 2px); height: 100%; background: var(--ornament-teal); }
+    .trust-legend {
+      display: flex;
+      justify-content: center;
+      gap: clamp(1rem, 2.5cqw, 2rem);
+      color: var(--muted);
+      font-size: clamp(.72rem, 1.25cqw, 1rem);
+      line-height: 1.2;
+    }
+    .trust-legend span { display: inline-flex; align-items: center; gap: clamp(.35rem, .7cqw, .55rem); }
+    .trust-legend i { display: block; width: clamp(.55rem, 1cqw, .8rem); height: clamp(.55rem, 1cqw, .8rem); border-radius: 50%; background: var(--ornament-teal); }
+    .trust-legend i.grey { background: var(--grey-bg); border: 1px solid var(--separator); }
+    .outcome-list {
+      display: grid;
+      gap: clamp(.8rem, 1.6cqw, 1.3rem);
+      padding: 0;
+      list-style: none;
+      counter-reset: outcome;
+    }
+    .outcome-list li {
+      display: grid;
+      grid-template-columns: clamp(2rem, 3.5cqw, 2.8rem) 1fr;
+      gap: var(--small-gap);
+      align-items: start;
+      color: var(--body);
+      font-size: clamp(.9rem, 1.56cqw, 1.25rem);
+      line-height: 1.35;
+      counter-increment: outcome;
+    }
+    .outcome-list li::before {
+      content: "0" counter(outcome);
+      color: var(--accent);
+      font-family: "Switzer Variable", system-ui, sans-serif;
+      font-size: clamp(.72rem, 1.25cqw, 1rem);
+      letter-spacing: .12em;
+    }
+    
+    /* === BLACK CONTRAST BAND === */
+    .black-band {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: clamp(1rem, 4cqw, 3.2rem);
+      margin: auto calc(-1 * var(--pad-x)) calc(-1 * var(--pad-y));
+      padding: clamp(1.4rem, 3cqw, 2.4rem) var(--pad-x);
+      background: var(--black);
+      color: var(--white);
+    }
+    .black-band .band-label {
+      color: var(--white);
+      font-size: clamp(.72rem, 1.25cqw, 1rem);
+      font-weight: 500;
+      letter-spacing: .16em;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+    .black-band .band-copy {
+      margin-top: clamp(.45rem, 1cqw, .8rem);
+      color: var(--white);
+      font-size: clamp(.86rem, 1.562cqw, 1.25rem);
+      line-height: 1.4;
+    }
+    .black-band .arrow {
+      color: var(--white);
+      font-family: "Instrument Serif", Georgia, serif;
+      font-size: clamp(2rem, 4cqw, 3.2rem);
+    }
+
+    /* === PRESENTATION CONTROLS === */
+    .controls {
+      position: fixed;
+      right: clamp(1rem, 2cqw, 1.5rem);
+      bottom: clamp(1rem, 2cqw, 1.5rem);
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      gap: clamp(.35rem, .7cqw, .55rem);
+      padding: clamp(.45rem, .8cqw, .65rem);
+      border: 1px solid rgba(0,0,0,.12);
+      border-radius: 999px;
+      background: rgba(255,255,255,.82);
+      box-shadow: 0 1rem 2rem rgba(0,0,0,.08);
+      backdrop-filter: blur(10px);
+    }
+    .dot {
+      width: clamp(.45rem, .8cqw, .65rem);
+      height: clamp(.45rem, .8cqw, .65rem);
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: var(--separator);
+      cursor: pointer;
+      transition: transform .2s ease, background-color .2s ease;
+    }
+    .dot:hover, .dot:focus-visible { background: var(--accent); }
+    .dot.active { background: var(--accent); transform: scale(1.35); }
+    .dot:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+    /* === REVEAL MOTION === */
+    .reveal {
+      visibility: hidden;
+      opacity: 0;
+      transform: translateY(clamp(.5rem, 1.2cqw, 1rem));
+    }
+    .slide.is-active .reveal {
+      visibility: visible;
+      animation: rise-in .7s cubic-bezier(.2,.75,.25,1) forwards;
+      animation-delay: calc(var(--i, 0) * 90ms);
+    }
+    @keyframes rise-in {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .slide.is-active .soft-pulse { animation: soft-pulse 1.3s ease-out .2s both; }
+    @keyframes soft-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(51,184,153,.38); }
+      100% { box-shadow: 0 0 0 clamp(1px, 1.4cqw, 1rem) rgba(51,184,153,0); }
+    }
+
+    /* === HEIGHT SAFETY BREAKPOINTS === */
+    @media (max-height: 700px) {
+      :root { --pad-y: clamp(1.4rem, 4.3cqw, 3rem); }
+      .illustration-slot { min-height: clamp(10rem, 27cqw, 18rem); }
+      .proof-panel { min-height: clamp(11rem, 30cqw, 20rem); }
+    }
+    @media (max-height: 600px) {
+      :root { --pad-y: clamp(1rem, 3.8cqw, 2.4rem); }
+      .slide-number { top: var(--pad-y); }
+      .copy-stack { gap: clamp(.6rem, 1.5cqw, 1rem); }
+      .illustration-slot { min-height: clamp(8rem, 24cqw, 14rem); }
+      .proof-panel { min-height: clamp(9rem, 26cqw, 16rem); }
+    }
+    @media (max-height: 500px) {
+      :root { --pad-y: clamp(.75rem, 3cqw, 1.5rem); }
+      .heading { font-size: clamp(1.8rem, 3.4cqw, 2.5rem); }
+      .body-copy, .bullet-list li { font-size: clamp(.82rem, 1.7cqw, 1.1rem); }
+      .illustration-slot { min-height: clamp(6rem, 20cqw, 10rem); }
+      .proof-panel { min-height: clamp(7rem, 22cqw, 12rem); }
+    }
+    @media (max-width: 700px) {
+      .content-row, .content-row.wide-left { grid-template-columns: minmax(0, 1fr); gap: clamp(1rem, 4cqw, 2rem); }
+      .content-row .illustration-slot { min-height: clamp(9rem, 26cqw, 14rem); }
+      .graph { max-width: 78cqw; }
+      .three-columns { gap: clamp(.6rem, 1.5cqw, 1rem); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      .reveal { visibility: visible; opacity: 1; transform: none; }
+    }
+    @media print {
+      @page { size: 1280px 720px; margin: 0; }
+      html { scroll-snap-type: none; }
+      body { background: var(--white); }
+      .slide { width: 1280px; height: 720px; max-width: none; max-height: none; break-after: page; page-break-after: always; }
+      .controls { display: none; }
+      .reveal { visibility: visible; opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck" aria-label="Hypercerts crash course for Loden Tewa">
+
+    <!-- === 01 / TITLE === -->
+    <section class="slide cream is-active" id="slide-1" aria-labelledby="title-heading">
+      <img class="ornament top-right" src="./assets/ornament/guilloche_01.svg" alt="" aria-hidden="true">
+      <div class="slide-number">01 / 12</div>
+      <div class="slide-shell">
+        <div class="top-row reveal" style="--i:0">
+          <p class="eyebrow accent">Hypercerts Foundation</p>
+        </div>
+        <div style="margin-top: auto; margin-bottom: auto;">
+          <h1 class="title reveal" id="title-heading" style="--i:1">
+            Hypercerts:<br><em class="accent">a crash course</em>
+          </h1>
+          <div class="title-lockup reveal" style="--i:2">
+            <div class="rule"></div>
+            <p class="body-copy">Open infrastructure for valuable work</p>
+          </div>
+        </div>
+        <div class="footer-lockup reveal" style="--i:3">
+          <p class="small-copy">Identity · portability · trust</p>
+          <img class="logo hypercerts" src="./assets/logos/hypercerts.svg" alt="Hypercerts">
+        </div>
+      </div>
+    </section>
+
+    <!-- === 02 / IDENTITY === -->
+    <section class="slide white" id="slide-2" aria-labelledby="identity-heading">
+      <div class="slide-number">02 / 12</div>
+      <div class="slide-shell">
+        <p class="eyebrow reveal" style="--i:0">The open web</p>
+        <div class="content-row wide-left">
+          <div class="copy-stack">
+            <h2 class="heading reveal" id="identity-heading" style="--i:1">
+              One identity, many apps<br><em class="accent">not one platform.</em>
+            </h2>
+            <ul class="bullet-list reveal" style="--i:2">
+              <li>One identity, many apps — built on ATProto and Bluesky.</li>
+              <li>Your identity is not owned by any single platform.</li>
+            </ul>
+          </div>
+          <div class="illustration-slot has-image reveal" style="--i:3">
+            <img class="illustration-image" src="./open-identity.png" alt="Editorial illustration of one identity connected to many applications">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- === 03 / PORTABILITY === -->
+    <section class="slide cream" id="slide-3" aria-labelledby="portability-heading">
+      <img class="ornament bottom-left" src="./assets/ornament/guilloche_03.svg" alt="" aria-hidden="true">
+      <div class="slide-number">03 / 12</div>
+      <div class="slide-shell">
+        <p class="eyebrow reveal" style="--i:0">Data portability</p>
+        <div class="content-row wide-left">
+          <div class="copy-stack">
+            <h2 class="heading reveal" id="portability-heading" style="--i:1">
+              Your data follows you<br><em class="accent">wherever you go.</em>
+            </h2>
+            <ul class="bullet-list reveal" style="--i:2">
+              <li>Your data follows you across applications.</li>
+              <li>Self-host it, or let a provider hold it — credible exit either way.</li>
+              <li>You are never locked in.</li>
+            </ul>
+          </div>
+          <div class="illustration-slot has-image reveal" style="--i:3">
+            <img class="illustration-image" src="./portable-data.png" alt="Editorial illustration of a portable record moving between applications">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- === 04 / LEXICONS === -->
+    <section class="slide white" id="slide-4" aria-labelledby="talk-heading">
+      <div class="slide-number">04 / 12</div>
+      <div class="slide-shell">
+        <p class="eyebrow reveal" style="--i:0">The plumbing</p>
+        <h2 class="heading reveal" id="talk-heading" style="--i:1">
+          Shared schemas<br><em class="accent">make open data usable.</em>
+        </h2>
+        <div class="content-row" style="gap: clamp(1rem, 3cqw, 2.4rem);">
+          <div class="copy-stack reveal" style="--i:2">
+            <p class="body-copy">Lexicons are shared schemas that different applications can read and write against.</p>
+            <p class="body-copy">This is the plumbing that makes portability actually work.</p>
+          </div>
+          <div class="flow-row reveal" role="group" aria-label="Application A reads and writes through a shared lexicon to Application B" style="--i:3">
+            <div class="diagram-node">Application A</div>
+            <div class="connector-h"></div>
+            <div class="arrow-right"></div>
+            <div class="diagram-node key soft-pulse">Lexicon</div>
+            <div class="arrow-right"></div>
+            <div class="connector-h"></div>
+            <div class="diagram-node">Application B</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- === 05 / WHAT HYPERCERTS IS === -->
+    <section class="slide cream" id="slide-5" aria-labelledby="what-heading">
+      <img class="ornament center-bottom" src="./assets/ornament/guilloche_05.svg" alt="" aria-hidden="true">
+      <div class="slide-number">05 / 12</div>
+      <div class="slide-shell" style="align-items: center; justify-content: center; text-align: center;">
+        <p class="eyebrow accent reveal" style="--i:0">A protocol, not a platform</p>
+        <h2 class="heading reveal" id="what-heading" style="--i:1; max-width: 72cqw; margin-top: clamp(1rem, 2cqw, 1.6rem);">
+          Hypercerts is open infrastructure<br><em class="accent">for recording, evaluating, and funding work.</em>
+        </h2>
+        <img class="logo hypercerts reveal" src="./assets/logos/hypercerts.svg" alt="Hypercerts" style="--i:2; margin-top: clamp(2rem, 5cqw, 4rem);">
+      </div>
+    </section>
+
+    <!-- === 06 / HYPERCERTS LEXICONS === -->
+    <section class="slide white" id="slide-6" aria-labelledby="definitions-heading">
+      <div class="slide-number">06 / 12</div>
+      <div class="slide-shell">
+        <p class="eyebrow reveal" style="--i:0">The shared language</p>
+        <h2 class="heading reveal" id="definitions-heading" style="--i:1">
+          Shared definitions<br><em class="accent">for shared records.</em>
+        </h2>
+        <div class="content-row" style="align-items: start; margin-top: clamp(1rem, 2.5cqw, 2rem);">
+          <ul class="bullet-list reveal" style="--i:2">
+            <li>I did this work.</li>
+            <li>These people contributed.</li>
+            <li>It happened during this period.</li>
+            <li>Here is the evidence.</li>
+            <li>Here is how somebody else evaluated it.</li>
+          </ul>
+          <div class="schema-card reveal" role="group" aria-label="Example shared record fields" style="--i:3">
+            <p class="eyebrow accent">A record can say</p>
+            <div class="schema-line"><span>contributor</span><code>did</code></div>
+            <div class="schema-line"><span>contribution</span><code>during</code></div>
+            <div class="schema-line"><span>evidence</span><code>supports</code></div>
+            <div class="schema-line"><span>evaluation</span><code>observes</code></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- === 07 / OPEN DATA === -->
+    <section class="slide white" id="slide-7" aria-labelledby="moat-heading">
+      <div class="slide-number">07 / 12</div>
+      <div class="slide-shell">
+        <p class="eyebrow reveal" style="--i:0">The product is the network</p>
+        <div class="copy-stack" style="margin-top: clamp(1.2rem, 3cqw, 2.4rem);">
+          <h2 class="heading reveal" id="moat-heading" style="--i:1">
+            The value compounds<br><em class="accent">because the data stays open.</em>
+          </h2>
+          <div class="three-columns reveal" style="--i:2; margin-top: clamp(1rem, 2.5cqw, 2rem);">
+            <div class="column-card">
+              <h3>Open data</h3>
+              <p class="small-copy">Records can be read by more than one application.</p>
+            </div>
+            <div class="column-card">
+              <h3>Interoperability</h3>
+              <p class="small-copy">The point is movement, not capture.</p>
+            </div>
+            <div class="column-card">
+              <h3>No lock-in</h3>
+              <p class="small-copy">Reports and records do not belong to one interface.</p>
+            </div>
+          </div>
+        </div>
+        <div class="black-band reveal" style="--i:3">
+          <div>
+            <p class="band-label">Open data</p>
+            <p class="band-copy">The same record can travel between tools.</p>
+          </div>
+          <p class="arrow" aria-hidden="true">→</p>
+          <div>
+            <p class="band-label">Interoperability</p>
+            <p class="band-copy">The moat is what compounds across the network.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- === 08 / MA EARTH === -->
+    <section class="slide cream" id="slide-8" aria-labelledby="maearth-heading">
+      <div class="slide-number">08 / 12</div>
+      <div class="slide-shell">
+        <p class="eyebrow reveal" style="--i:0">Proof point: Maearth</p>
+        <div class="content-row wide-left">
+          <div class="copy-stack">
+            <h2 class="heading reveal" id="maearth-heading" style="--i:1">
+              Regeneration moves faster<br><em class="accent">when records travel.</em>
+            </h2>
+            <div class="three-columns reveal" style="--i:2; grid-template-columns: repeat(3, minmax(0, 1fr));">
+              <div class="column-card">
+                <p class="figure accent">$2M</p>
+                <p class="figure-label">raised</p>
+              </div>
+              <div class="column-card">
+                <p class="figure">01</p>
+                <p class="figure-label">first mover in regeneration</p>
+              </div>
+              <div class="column-card">
+                <p class="figure">↗</p>
+                <p class="figure-label">applicants also recording data on GainForest</p>
+              </div>
+            </div>
+          </div>
+          <div class="proof-panel reveal" style="--i:3">
+            <div class="proof-logos">
+              <img class="logo ma-earth" src="./assets/logos/ma-earth.png" alt="Ma Earth">
+              <div class="thin-rule"></div>
+              <img class="logo gainforest" src="./assets/logos/gainforest.svg" alt="GainForest">
+            </div>
+            <img class="proof-image" src="./regeneration.png" alt="Field team documenting ecological regeneration beside a restored stream">
+            <p class="proof-caption">A first mover gives an open network somewhere concrete to begin.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- === 09 / INTEROPERABILITY === -->
+    <section class="slide white" id="slide-9" aria-labelledby="unlock-heading">
+      <div class="slide-number">09 / 12</div>
+      <div class="slide-shell">
+        <p class="eyebrow reveal" style="--i:0">What interoperability unlocks</p>
+        <h2 class="heading reveal" id="unlock-heading" style="--i:1">
+          One report<br><em class="accent">many second lives.</em>
+        </h2>
+        <div class="flow-row reveal" role="group" aria-label="A Hypercerts report can become a portfolio and be reused in another application" style="--i:2; margin-top: clamp(2rem, 5cqw, 4rem);">
+          <div class="diagram-node key soft-pulse">Hypercerts<br>report</div>
+          <div class="connector-h"></div>
+          <div class="arrow-right"></div>
+          <div class="diagram-node">Portfolio</div>
+          <div class="connector-h"></div>
+          <div class="arrow-right"></div>
+          <div class="diagram-node">Another<br>application</div>
+        </div>
+        <p class="body-copy reveal" style="--i:3; max-width: 62cqw; margin-top: clamp(1.5rem, 3cqw, 2.4rem);">
+          A report built through Hypercerts is not siloed. Reuse it as a portfolio. Apply elsewhere with the same record.
+        </p>
+      </div>
+    </section>
+
+    <!-- === 10 / TRUST GRAPH === -->
+    <section class="slide grey" id="slide-10" aria-labelledby="trust-heading">
+      <div class="slide-number">10 / 12</div>
+      <div class="slide-shell">
+        <p class="eyebrow reveal" style="--i:0">The trust graph</p>
+        <h2 class="heading reveal" id="trust-heading" style="--i:1">
+          Trust is a relationship<br><em class="accent">not a checkbox.</em>
+        </h2>
+        <div class="graph reveal" style="--i:2; margin-top: clamp(1rem, 2cqw, 1.6rem);">
+          <div class="diagram-node key soft-pulse brand-node" style="grid-column: 1; grid-row: 1;">
+            <img class="brand-mark" src="./assets/logos/lodentewa.png" alt="" aria-hidden="true"> Loden Tewa
+          </div>
+          <div style="grid-column: 2; grid-row: 1; display: flex; align-items: center;"><div class="graph-hline"></div></div>
+          <div class="diagram-node" style="grid-column: 3; grid-row: 1;">Project</div>
+          <div style="grid-column: 1 / 4; grid-row: 2; display: flex; justify-content: center;"><div class="graph-vline"></div></div>
+          <div class="diagram-node" style="grid-column: 1; grid-row: 3;">Venture<br>records work</div>
+          <div style="grid-column: 2; grid-row: 3; display: flex; align-items: center;"><div class="graph-hline"></div></div>
+          <div class="diagram-node" style="grid-column: 3; grid-row: 3;">Partner<br>evaluates work</div>
+        </div>
+        <div class="trust-legend reveal" style="--i:3; margin-top: clamp(1rem, 2cqw, 1.5rem);">
+          <span><i></i> Loden Tewa endorses a venture</span>
+          <span><i class="grey"></i> Other applications observe the relationship</span>
+        </div>
+        <p class="small-copy reveal" style="--i:4; max-width: 70cqw; margin: clamp(1rem, 2cqw, 1.5rem) auto 0; text-align: center;">
+          RMA licenses Loden Tewa. A venture records its work. A co-funder evaluates that work. Another application can observe those relationships.
+        </p>
+      </div>
+    </section>
+
+    <!-- === 11 / OPEN IS NOT TRUSTED === -->
+    <section class="slide cream" id="slide-11" aria-labelledby="catch-heading">
+      <img class="ornament top-right" src="./assets/ornament/guilloche_01.svg" alt="" aria-hidden="true">
+      <div class="slide-number">11 / 12</div>
+      <div class="slide-shell">
+        <p class="eyebrow accent reveal" style="--i:0">The catch</p>
+        <h2 class="heading reveal" id="catch-heading" style="--i:1">
+          Open data is permissionless<br><em class="accent">trust still has to be earned.</em>
+        </h2>
+        <div class="three-columns reveal" style="--i:2; margin-top: clamp(2rem, 4cqw, 3.2rem);">
+          <div class="column-card">
+            <h3>Open</h3>
+            <p class="small-copy">Anyone can join. Anyone can contribute.</p>
+          </div>
+          <div class="column-card">
+            <h3>Risk</h3>
+            <p class="small-copy">Permissionless and decentralized also means impersonation risk.</p>
+          </div>
+          <div class="column-card">
+            <h3>Trust</h3>
+            <p class="small-copy">Trust comes from the endorsement graph, not from the data being open.</p>
+          </div>
+        </div>
+        <div class="footer-lockup reveal" style="--i:3; margin-top: clamp(2rem, 4cqw, 3rem);">
+          <p class="lead">Like any network effect, it needs a first mover.</p>
+          <p class="small-copy">Maearth · regeneration</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- === 12 / LODEN TEWA USE CASE === -->
+    <section class="slide white" id="slide-12" aria-labelledby="lodentewa-heading">
+      <div class="slide-number">12 / 12</div>
+      <div class="slide-shell">
+        <p class="eyebrow reveal" style="--i:0">How Loden Tewa and co-funders could use this</p>
+        <h2 class="heading reveal" id="lodentewa-heading" style="--i:1">
+          Vet a venture once,<br><em class="accent">every funder can reuse it.</em>
+        </h2>
+        <div class="content-row wide-left" style="align-items: start; margin-top: clamp(.8rem, 1.5cqw, 1.2rem);">
+          <div class="copy-stack reveal" style="--i:2; gap: clamp(.55rem, 1.2cqw, .9rem);">
+            <div class="flow-row">
+              <div class="diagram-node key brand-node"><img class="brand-mark" src="./assets/logos/lodentewa.png" alt="" aria-hidden="true"> Loden Tewa</div>
+              <div class="connector-h"></div><div class="arrow-right"></div>
+              <div class="diagram-node compact">Due diligence</div>
+              <div class="connector-h"></div><div class="arrow-right"></div>
+              <div class="diagram-node compact">Venture</div>
+            </div>
+            <p class="small-copy" style="padding-left: clamp(.3rem, 1cqw, .8rem);">Accelerator · Tewa Catalytic Facility · Tewa Impact Fund</p>
+            <div class="flow-row" style="margin-top: clamp(.35rem, 1cqw, .8rem);">
+              <div class="diagram-node compact">Co-funders</div>
+              <div class="connector-h"></div><div class="arrow-right"></div>
+              <div class="diagram-node">same schema, same records</div>
+            </div>
+            <p class="small-copy" style="padding-left: clamp(.3rem, 1cqw, .8rem);">UNDP Bhutan · Pelsung · Loden Foundation · DoEE</p>
+          </div>
+          <div class="copy-stack reveal" style="--i:3;">
+            <ul class="outcome-list">
+              <li>Funders write applications, assessments and endorsements against one shared schema, so a venture vetted by Loden Tewa doesn&rsquo;t start from zero with UNDP or Pelsung.</li>
+              <li>Ventures carry one verifiable track record from grant to accelerator to concessional loan to equity.</li>
+              <li>Each funder keeps its own decision; they just stop paying for the same diligence twice.</li>
+              <li>Machine-readable also means AI- and agent-legible &mdash; a public history of Bhutan&rsquo;s social ventures, not a pile of PDFs.</li>
+            </ul>
+            <img class="history-image" src="./machine-public-history.png" alt="Editorial illustration of a connected public history graph">
+          </div>
+        </div>
+        <div class="footer-lockup reveal" style="--i:5; margin-top: clamp(.8rem, 1.5cqw, 1.2rem);">
+          <div class="logo-lockup">
+            <img class="logo hypercerts" src="./assets/logos/hypercerts.svg" alt="Hypercerts">
+            <img class="logo ma-earth" src="./assets/logos/ma-earth.png" alt="Ma Earth">
+            <img class="logo gainforest" src="./assets/logos/gainforest.svg" alt="GainForest">
+          </div>
+          <p class="small-copy">A public record of support, work and trust.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- === NAVIGATION === -->
+  <nav class="controls" aria-label="Slide navigation">
+    <button class="dot active" type="button" aria-label="Go to slide 1" aria-current="true" data-slide="0"></button>
+    <button class="dot" type="button" aria-label="Go to slide 2" data-slide="1"></button>
+    <button class="dot" type="button" aria-label="Go to slide 3" data-slide="2"></button>
+    <button class="dot" type="button" aria-label="Go to slide 4" data-slide="3"></button>
+    <button class="dot" type="button" aria-label="Go to slide 5" data-slide="4"></button>
+    <button class="dot" type="button" aria-label="Go to slide 6" data-slide="5"></button>
+    <button class="dot" type="button" aria-label="Go to slide 7" data-slide="6"></button>
+    <button class="dot" type="button" aria-label="Go to slide 8" data-slide="7"></button>
+    <button class="dot" type="button" aria-label="Go to slide 9" data-slide="8"></button>
+    <button class="dot" type="button" aria-label="Go to slide 10" data-slide="9"></button>
+    <button class="dot" type="button" aria-label="Go to slide 11" data-slide="10"></button>
+    <button class="dot" type="button" aria-label="Go to slide 12" data-slide="11"></button>
+  </nav>
+
+  <script>
+    /* === PRESENTATION RUNTIME === */
+    (() => {
+      const slides = [...document.querySelectorAll('.slide')];
+      const dots = [...document.querySelectorAll('.dot')];
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let activeIndex = 0;
+      let wheelLocked = false;
+      let pointerStartY = null;
+
+      const setActive = (index) => {
+        activeIndex = Math.max(0, Math.min(index, slides.length - 1));
+        slides.forEach((slide, i) => {
+          slide.classList.toggle('is-active', i === activeIndex);
+          if (i === activeIndex) slide.removeAttribute('aria-hidden');
+          else slide.setAttribute('aria-hidden', 'true');
+        });
+        dots.forEach((dot, i) => {
+          const isCurrent = i === activeIndex;
+          dot.classList.toggle('active', isCurrent);
+          if (isCurrent) dot.setAttribute('aria-current', 'true');
+          else dot.removeAttribute('aria-current');
+        });
+      };
+
+      const goTo = (index) => {
+        setActive(index);
+        window.scrollTo({
+          top: slides[activeIndex].offsetTop,
+          behavior: reducedMotion.matches ? 'auto' : 'smooth'
+        });
+      };
+
+      const next = () => goTo(activeIndex + 1);
+      const previous = () => goTo(activeIndex - 1);
+
+      dots.forEach((dot) => dot.addEventListener('click', () => goTo(Number(dot.dataset.slide))));
+
+      document.addEventListener('keydown', (event) => {
+        if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(event.key)) {
+          event.preventDefault();
+          next();
+        }
+        if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(event.key)) {
+          event.preventDefault();
+          previous();
+        }
+        if (event.key === 'Home') { event.preventDefault(); goTo(0); }
+        if (event.key === 'End') { event.preventDefault(); goTo(slides.length - 1); }
+      });
+
+      document.addEventListener('wheel', (event) => {
+        if (Math.abs(event.deltaY) < 12 || wheelLocked) return;
+        wheelLocked = true;
+        event.deltaY > 0 ? next() : previous();
+        window.setTimeout(() => { wheelLocked = false; }, 650);
+      }, { passive: true });
+
+      document.addEventListener('pointerdown', (event) => { pointerStartY = event.clientY; });
+      document.addEventListener('pointerup', (event) => {
+        if (pointerStartY === null) return;
+        const distance = event.clientY - pointerStartY;
+        if (Math.abs(distance) > 48) distance < 0 ? next() : previous();
+        pointerStartY = null;
+      });
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio > .6) {
+            setActive(slides.indexOf(entry.target));
+          }
+        });
+      }, { threshold: [.6] });
+      slides.forEach((slide) => observer.observe(slide));
+
+      setActive(0);
+    })();
+  </script>
+</body>
+</html>
